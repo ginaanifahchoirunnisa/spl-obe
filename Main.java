@@ -22,7 +22,7 @@ public class Main {
             if (pilihan == 1) gauss();
             else if (pilihan == 2) gaussjordan();
             else if (pilihan == 3) balikan();
-            // else if (pilihan == 4) cramer();
+            else if (pilihan == 4) cramer();
             else if(pilihan == 5) System.exit(0);
             else{
                 System.out.println("Masukan salah. Silakan masukkan ulang!");
@@ -200,5 +200,58 @@ public class Main {
         }else {
             System.out.println("\nMetode Matriks Balikan tidak dapat menyelesaikan persamaan.");
         }
+
+        System.out.println();
+        System.out.println("Menuju menu utama......");
+        utama();
+    }
+
+    static void cramer(){
+        System.out.println("\n=== Kaidah Cramer ===");
+        Matriks M = new Matriks();
+        Matriks Mtemp = new Matriks();
+        Matriks Mhasil = new Matriks();
+        double[] konstanta = new double[100];
+        masukanlain(M, konstanta);
+
+        Mtemp.SetBrs(M.GetBrs());
+        Mtemp.SetKol(M.GetKol());
+        double[] detMi = new double[M.GetKol()+1];
+
+        //Menghitung deteminan M
+        M.salinMatriks(Mtemp);
+        double detM = M.determinanM();
+        System.out.println();
+
+        if (M.GetBrs() == M.GetKol()){
+            if ((detM*10)%10 == 0)  System.out.printf("det(M) = %.0f\n", detM);
+            else System.out.printf("det(M) = %.2f\n", detM);
+
+            //Menghitung Determinan D(i)
+            for(int j=1; j<=M.GetKol(); j++){
+                Mtemp.salinMatriks(M);
+                M.ubahKol(konstanta,j);
+                detMi[j] = M.determinanM();
+                if((detMi[j]*10)%10 == 0) System.out.printf("det(M%d) = %.0f\n", j, detMi[j]);
+                else System.out.printf("det(M%d) = %.2f\n", j, detMi[j]);
+            }
+
+            //Menuliskan solusi tunggal jika ada
+            if (detM != 0){
+                System.out.println("\nSolusi Sistem Persamaan: ");
+                for(int j=1; j<=M.GetKol(); j++){
+                    if(((detMi[j]/detM)*10)%10 == 0) System.out.printf("x[%d] = %.0f\n", j, (detMi[j]/detM)); 
+                    else System.out.printf("x[%d] = %.2f\n", j, (detMi[j]/detM));
+                }
+            }else {
+                System.out.println("\nKaidah Cramer tidak dapat menyelesaikan persamaan");
+            } 
+        } else {
+            System.out.println("Kaidah Cramer tidak dapat menyelesaikan persamaan");
+        } 
+
+        System.out.println();
+        System.out.println("Menuju menu utama......");
+        utama();
     }
 }

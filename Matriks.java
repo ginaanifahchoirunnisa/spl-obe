@@ -50,6 +50,25 @@ public class Matriks {
         }
     }
 
+    public double pangkat(int x, int y){
+        double result = 1;
+        for(int i=1; i<=y; i++){
+            result *= x;
+        }
+        return result;
+    }
+
+    public double kaliDiagonal(){
+        double sum = 1;
+        for(int i=1; i<=this.GetBrs(); i++){
+            for(int j=1; j<=this.GetKol(); j++){
+                if(j==i) sum *= this.GetElmt(i,j);
+            }
+        }
+        return sum;
+    }
+
+
     public void bacaFile(File inputfile){
         int brs = 0, kol = 0;
 
@@ -520,6 +539,47 @@ public class Matriks {
         catch (FileNotFoundException ex){
             System.out.println("File tidak ditemukan");
         }
+    }
+
+    public double determinanM (){
+        int jmlTukarBrs=0;
+        if(this.GetKol() == this.GetBrs()){
+            int brs = 1;
+            int kol = 1;
+            int indeksMaks;
+            while(brs <= this.GetBrs() && kol <= this.GetKol()){
+                indeksMaks = -1; 
+                //Mencari baris yang tidak bernilai 0 dalam suatu kolom
+                for(int i = brs; i <= this.GetBrs() && indeksMaks == -1; i++){
+                    if(this.GetElmt(i,kol) != 0) indeksMaks = i;
+                }
+    
+                //Jika tidak ada baris bernilai nol di sebuah kolom, lanjut ke kolom selanjutnya
+                if(indeksMaks == -1) kol++;
+    
+                //Jika ada akan diproses
+                else{                    
+                    if(brs != indeksMaks){
+                        jmlTukarBrs = jmlTukarBrs + 1;   //Menghitung jumlah tukar baris
+                        this.tukarBrs(brs,indeksMaks); //Tukar baris
+                    } 
+                    
+                    //Mengurangi seluruh kolom di bawah 1 utama pada baris dengan rasio baris lain
+                    for(int i = brs+1; i <= this.GetBrs(); i++){
+                        double rasio = (-1*this.GetElmt(i, kol)) / this.GetElmt(brs,kol);
+                        for (int j = kol; j <= this.GetKol(); j++){
+                            this.SetElmt(i, j , this.GetElmt(i,j) + rasio*this.GetElmt(brs,j));
+                        }
+                    }
+    
+                    //Lanjut ke baris dan pengecekan kolom selajuntnya
+                    brs++;
+                    kol++;
+                    
+                }
+            }
+        }
+        return this.kaliDiagonal() * this.pangkat(-1,jmlTukarBrs);
     }
 
 }
