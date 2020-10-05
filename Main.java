@@ -210,7 +210,6 @@ public class Main {
         System.out.println("\n=== Kaidah Cramer ===");
         Matriks M = new Matriks();
         Matriks Mtemp = new Matriks();
-        Matriks Mhasil = new Matriks();
         double[] konstanta = new double[100];
         masukanlain(M, konstanta);
 
