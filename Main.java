@@ -21,7 +21,7 @@ public class Main {
         while(true){
             if (pilihan == 1) gauss();
             else if (pilihan == 2) gaussjordan();
-            // else if (pilihan == 3) balikan();
+            else if (pilihan == 3) balikan();
             // else if (pilihan == 4) cramer();
             else if(pilihan == 5) System.exit(0);
             else{
@@ -31,7 +31,7 @@ public class Main {
         }
     }
 
-    static void masukan(Matriks M){
+    static void masukanelim(Matriks M){
         System.out.println("1. Masukan dari keyboard");
         System.out.println("2. Masukan dari file");
         System.out.print("Masukkan pilihan: ");
@@ -74,6 +74,48 @@ public class Main {
         }
     }
 
+    static void masukanlain(Matriks M, double[] konstanta){
+        System.out.println("1. Masukan dari keyboard");
+        System.out.println("2. Masukan dari file");
+        System.out.print("Masukkan pilihan: ");
+        int masukan = in.nextInt();
+        System.out.println();
+       
+        
+        while(true){
+            if(masukan == 1){
+                //Meminta input jumlah persamaan dan jumlah peubah
+                System.out.print("Masukkan jumlah persamaan: ");
+                int n = in.nextInt();
+                System.out.print("Masukkan jumlah peubah: ");
+                int m = in.nextInt();
+                M.SetBrs(n);
+                M.SetKol(m);
+                M.bacaKoefKeyboard(konstanta, n, m+1);
+                break;
+
+            } else if (masukan == 2) {
+                //Membaca matriks yang ada di file
+                String namaFile = in.nextLine();
+                File file  = new File(namaFile);
+
+                while(!file.exists()){
+                    System.out.print("Masukkan nama file: ");
+                    namaFile = in.nextLine();
+                    file = new File(namaFile);
+                }
+
+                M.bacaKoefFile(file, konstanta);
+                System.out.println();
+                break;
+
+            }else{
+                System.out.print("Masukan salah. Silakan masukkan ulang! ");
+                masukan = in.nextInt();   
+            }
+        }
+    }
+
     static void tulisMatriksAugmented(Matriks M){
         System.out.println("Matriks Augmented: ");
         M.tulisMatriks();
@@ -83,7 +125,7 @@ public class Main {
     static void gauss(){
         System.out.println("\n=== Eliminasi Gauss ===");
         Matriks M = new Matriks();
-        masukan(M);
+        masukanelim(M);
         tulisMatriksAugmented(M);
         Matriks Mmanip = new Matriks(M.GetBrs(),M.GetKol());
         M.salinMatriks(Mmanip);
@@ -108,7 +150,7 @@ public class Main {
     static void gaussjordan(){
         System.out.println("\n=== Eliminasi Gauss-Jordan ===");
         Matriks M = new Matriks();
-        masukan(M);
+        masukanelim(M);
         tulisMatriksAugmented(M);
 
         M.eliminasiGaussJordan();
@@ -126,5 +168,37 @@ public class Main {
         utama();
     }
 
-        
+    static void balikan(){
+        System.out.println("\n=== Metode Matriks Balikan ===");
+        Matriks M = new Matriks();
+        Matriks Mtemp = new Matriks();
+        Matriks Mhasil = new Matriks();
+        double[] konstanta = new double[100];
+        masukanlain(M, konstanta);
+
+        if(M.GetBrs() == M.GetKol()){
+        //Menerapkan eliminasi Gauss-Jordan untuk memindahkan matriks identitas ke kiri
+            Mtemp.SetBrs(M.GetBrs());
+            Mtemp.SetKol(2*M.GetKol());
+            M.salinMatriks(Mtemp);
+            M.isiIdentitas(Mtemp);
+            Mtemp.eliminasiGaussJordan();
+
+            if (Mtemp.cekDiagonalInvers()){
+                System.out.println("\nMatriks hasil operasi baris elementer: ");
+                Mtemp.tulisMatriks();
+                System.out.println();
+            
+                //Menuliskan hasil sistem persamaan
+                Mhasil.SetBrs(Mtemp.GetBrs());
+                Mhasil.SetKol(1);
+                Mtemp.kaliMatriksKonstanta(konstanta, Mhasil);
+                Mhasil.tulisHasilSPLIvnvers();
+            }else {
+                System.out.println("\nMetode Matriks Balikan tidak dapat menyelesaikan persamaan.");
+            }
+        }else {
+            System.out.println("\nMetode Matriks Balikan tidak dapat menyelesaikan persamaan.");
+        }
+    }
 }

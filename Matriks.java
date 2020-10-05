@@ -145,6 +145,27 @@ public class Matriks {
         }
     }
 
+    public void isiIdentitas(Matriks M){
+        for(int i = 1; i<=this.GetBrs(); i++){
+            for(int j = this.GetKol()+1 ; j <= M.GetKol(); j++){
+                if(j-i == this.GetKol()) M.SetElmt(i,j,1);
+                else M.SetElmt(i,j,0);
+            }
+        }
+    }
+
+    public boolean cekDiagonalInvers(){
+        boolean cek = true;
+        for(int i = 1; i <= this.GetBrs(); i++){
+            for (int j = 1; j <= this.GetKol(); j++){
+                if(i==j){
+                    if(this.GetElmt(i,j) != 1) cek = false;
+                }
+            }
+        }
+        return cek;
+    }
+
     public void eliminasiGauss(){
         int brs = 1;
         int kol = 1;
@@ -385,4 +406,120 @@ public class Matriks {
             }
         }
     }
+
+    public void ubahKol(double konstanta [], int j ){
+        for(int i = 1; i<= this.GetBrs(); i++){
+            this.SetElmt(i,j, konstanta[i]);
+        }
+    }
+
+    public void segitigaAtas(int jmlTukarBrs){
+        if(this.GetKol() == this.GetBrs()){
+            int brs = 1;
+            int kol = 1;
+            int indeksMaks;
+            while(brs <= this.GetBrs() && kol<=this.GetKol()){
+                indeksMaks = -1; 
+                //Mencari baris yang tidak bernilai 0 dalam suatu kolom
+                for(int i = brs; i <= this.GetBrs() && indeksMaks == -1; i++){
+                    if(this.GetElmt(i,kol) != 0) indeksMaks = i;
+                }
+    
+                //Jika tidak ada baris bernilai nol di sebuah kolom, lanjut ke kolom selanjutnya
+                if(indeksMaks == -1) kol++;
+    
+                //Jika ada akan diproses
+                else{                    
+                    if(brs != indeksMaks){
+                        jmlTukarBrs = jmlTukarBrs + 1;   //Menghitung jumlah tukar baris
+                        this.tukarBrs(brs,indeksMaks); //Tukar baris
+                    } 
+                    
+                    //Mengurangi seluruh kolom di bawah 1 utama pada baris dengan rasio baris lain
+                    for(int i = brs+1; i <= this.GetBrs(); i++){
+                        double rasio = (-1*this.GetElmt(i, kol)) / this.GetElmt(brs,kol);
+                        for (int j = kol; j <= this.GetKol(); j++){
+                            this.SetElmt(i, j , this.GetElmt(i,j) + rasio*this.GetElmt(brs,j));
+                        }
+                    }
+    
+                    //Lanjut ke baris dan pengecekan kolom selajuntnya
+                    brs++;
+                    kol++;
+                    
+                }
+            }
+        }
+    }
+
+    public void kaliMatriksKonstanta(double[] M2, Matriks Mhasil){
+        for(int i = 1; i <= this.GetBrs(); i++){
+            for(int j = 1; j<=1; j++){
+                for(int k = (this.GetKol()/2)+1; k <= this.GetKol(); k++){
+                    Mhasil.SetElmt(i,j,Mhasil.GetElmt(i,j)+this.GetElmt(i,k)*M2[k-(this.GetKol()/2)]);
+                }
+            }
+        }
+    }
+
+    public void tulisHasilSPLIvnvers(){
+        System.out.println("Solusi Sistem Persamaan: ");
+        for(int i = 1; i <= this.GetBrs(); i++){
+            if((this.GetElmt(i,1)*10)%10 == 0) System.out.printf("x[%d] = %.0f\n", i, this.GetElmt(i,1));
+            else System.out.printf("x[%d] = %.2f\n", i, this.GetElmt(i,1));
+        }
+    }
+
+    public void bacaKoefKeyboard(double[] konstanta, int n, int m){
+        for(int i=1; i<= n; i++){
+            System.out.println();
+            System.out.println("Masukkan persamaan ke-" + i + " :");
+            for (int j = 1; j<= m; j++){
+                if (j == m) {
+                    System.out.print("Masukkan konstanta: ");
+                    double x = in.nextDouble();
+                    konstanta[i] = x;
+                }else {
+                    System.out.print("Masukkan koefisien x[" + j + "]: ");
+                    double x = in.nextDouble();
+                    this.SetElmt(i,j,x);
+                }
+            }
+        }
+    }
+
+    public void bacaKoefFile(File inputfile, double konstanta[]){
+        int brs = 0, kol = 0;
+
+        try{
+            Scanner in = new Scanner(inputfile);
+            while(in.hasNextLine()){
+                String baris = in.nextLine();
+                brs++;
+
+                Scanner inLine = new Scanner(baris);
+                while(inLine.hasNextDouble() && brs == 1){
+                    inLine.nextDouble();
+                    kol++;
+                }
+            }
+
+            in.close();
+            this.SetBrs(brs);
+            this.SetKol(kol-1);
+
+            in = new Scanner(inputfile);
+            for(int i = 1; i <= brs; i++){
+                for(int j = 1; j <= kol; j++) {
+                    if(j == kol){
+                        konstanta[i] = in.nextDouble();
+                    } else this.SetElmt(i,j,in.nextDouble());
+                }
+            }
+        } 
+        catch (FileNotFoundException ex){
+            System.out.println("File tidak ditemukan");
+        }
+    }
+
 }
